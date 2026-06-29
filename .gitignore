@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Local environment overrides
+.env
+
 # Your personal CV data — keep off the repo
 # Use resume.template.json as the starting point
 resume.json

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background pill -->
+  <rect width="32" height="32" rx="7" fill="#0969da"/>
+  <!-- Document body -->
+  <rect x="8" y="5" width="14" height="18" rx="2" fill="white" opacity="0.15"/>
+  <rect x="8" y="5" width="14" height="18" rx="2" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+  <!-- Header line (name) -->
+  <rect x="10.5" y="8.5" width="9" height="2" rx="1" fill="white"/>
+  <!-- Content lines -->
+  <rect x="10.5" y="13" width="7" height="1.5" rx="0.75" fill="white" opacity="0.75"/>
+  <rect x="10.5" y="16" width="9" height="1.5" rx="0.75" fill="white" opacity="0.75"/>
+  <rect x="10.5" y="19" width="5.5" height="1.5" rx="0.75" fill="white" opacity="0.75"/>
+  <!-- Folded corner -->
+  <path d="M19 5 L22 8 L19 8 Z" fill="white" opacity="0.35"/>
+</svg>

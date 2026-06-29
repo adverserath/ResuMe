@@ -1,8 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { marked } = require('marked');
 const puppeteer = require('puppeteer-core');
+const rateLimit = require('express-rate-limit');
 const jsonresume = require('./jsonresume');
 
 const app = express();
@@ -34,14 +36,79 @@ marked.setOptions({ gfm: true, breaks: false });
 app.use('/themes', express.static(path.join(__dirname, 'themes')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+const puppeteerLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many requests — please try again in a few minutes.',
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(
+    'User-agent: *\nAllow: /\n\nUser-agent: AhrefsBot\nDisallow: /\n\nUser-agent: MJ12bot\nDisallow: /\n\nUser-agent: SemrushBot\nDisallow: /\n'
+  );
+});
+
 function readCss(name) {
   return fs.readFileSync(path.join(__dirname, 'themes', `${name}.css`), 'utf8');
+}
+
+function getSectionSlug(content) {
+  const m = content.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/);
+  if (!m) return '';
+  return m[1].replace(/<[^>]+>/g, '').trim()
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function filterSections(wrappedHtml, excludeSlugs) {
+  if (!excludeSlugs.length) return wrappedHtml;
+  const re = /<section class="cv-section">([\s\S]*?)<\/section>/g;
+  const parts = [];
+  let m;
+  while ((m = re.exec(wrappedHtml)) !== null) {
+    if (!excludeSlugs.includes(getSectionSlug(m[1]))) parts.push(m[0]);
+  }
+  return parts.join('\n');
 }
 
 function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
   const styleBlock = forPdf
     ? `<style>${readCss('base')}</style>\n  <style>${readCss(theme)}</style>`
     : `<link rel="stylesheet" href="/themes/base.css">\n  <link rel="stylesheet" href="/themes/${theme}.css">`;
+
+  const pdfStyles = forPdf ? `
+  <style>
+    body { background: #fff !important; }
+    .markdown-body {
+      font-size: 11.5px;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .markdown-body h1 { font-size: 1.6em; }
+    .markdown-body h2 { font-size: 1.2em; margin-top: 0; margin-bottom: 10px; }
+    .markdown-body h3 { font-size: 1.05em; margin-top: 8px; margin-bottom: 4px; }
+    .markdown-body h2, .markdown-body h3 { break-after: avoid; page-break-after: avoid; }
+    .markdown-body table { display: table; overflow: visible; width: 100%; }
+    .markdown-body p { margin-bottom: 8px; }
+    .markdown-body ul { margin-bottom: 8px; }
+    .cv-section {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 0 0 12px 0 !important;
+      margin-bottom: 0 !important;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .cv-section:first-child { padding: 0 0 12px 0 !important; }
+    .cv-section + .cv-section {
+      border-top: 1px solid #d0d7de !important;
+      padding-top: 12px !important;
+    }
+    .cv-project { page-break-inside: avoid; break-inside: avoid; }
+  </style>` : '';
 
   const controls = forPdf ? '' : `
     <div class="cv-controls">
@@ -57,6 +124,12 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
   const controlsCss = forPdf ? '' : '<link rel="stylesheet" href="/public/controls.css">';
   const appScript = forPdf ? '' : '<script src="/public/app.js"></script>';
   const bodyAttr = forPdf ? ' class="pdf-mode"' : '';
+  const footer = forPdf ? '' : `
+  <footer class="cv-footer">
+    Built with <a href="https://github.com/adverserath/ResuMe" target="_blank" rel="noopener">ResuMe</a> — self-hosted CV platform
+    &nbsp;·&nbsp;
+    <a href="https://buymeacoffee.com/adverserath" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+  </footer>`;
 
   const ogMeta = forPdf ? '' : `
   <meta property="og:type" content="profile">
@@ -69,8 +142,9 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV</title>${ogMeta}
-  ${styleBlock}
+  <title>ResuMe — Self-hosted CV</title>
+  <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">${ogMeta}
+  ${styleBlock}${pdfStyles}
   ${controlsCss}
 </head>
 <body${bodyAttr}>
@@ -79,6 +153,7 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
     ${markdownHtml}
   </main>
   ${appScript}
+  ${footer}
 </body>
 </html>`;
 }
@@ -117,10 +192,11 @@ app.get('/', (req, res) => {
   res.send(buildHtml(html, theme));
 });
 
-app.get('/download', async (req, res) => {
+app.get('/download', puppeteerLimiter, async (req, res) => {
   const theme = resolvedTheme(req.query.theme);
   const meta = loadMeta();
   const filename = meta.pdfFilename || 'cv.pdf';
+  const exclude = req.query.exclude ? req.query.exclude.split(',').filter(Boolean) : [];
   let browser;
   try {
     browser = await puppeteer.launch({
@@ -129,7 +205,9 @@ app.get('/download', async (req, res) => {
       headless: true,
     });
     const page = await browser.newPage();
-    const html = applyModeFilter(wrapSections(loadCvHtml()), true);
+    await page.setViewport({ width: 800, height: 1131 });
+    let html = applyModeFilter(wrapSections(loadCvHtml()), true);
+    if (exclude.length) html = filterSections(html, exclude);
     await page.setContent(buildHtml(html, theme, { forPdf: true }), {
       waitUntil: 'domcontentloaded',
     });
@@ -161,14 +239,14 @@ app.get('/timeline', (req, res) => {
   res.send(injected);
 });
 
-app.get('/og-image', async (req, res) => {
+app.get('/og-image', puppeteerLimiter, async (req, res) => {
   let browser;
   try {
     const data = fs.existsSync(JSON_RESUME_PATH)
       ? JSON.parse(fs.readFileSync(JSON_RESUME_PATH, 'utf8'))
       : {};
     const basics = data.basics || {};
-    const name = basics.name || 'CV';
+    const name = basics.name || 'ResuMe - Selfhosted CV';
     const label = basics.label || '';
     const loc = basics.location;
     const locationStr = loc ? [loc.city, loc.region, loc.countryCode].filter(Boolean).join(', ') : '';

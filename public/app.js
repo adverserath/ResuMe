@@ -311,6 +311,70 @@
       }
     });
 
+    // ── Download section selector ────────────────────────────
+    var dlLink = document.querySelector('.cv-controls__download');
+    if (dlLink) {
+      dlLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        openDownloadModal(dlLink.href);
+      });
+    }
+
+    function openDownloadModal(baseHref) {
+      var backdrop = document.createElement('div');
+      backdrop.className = 'cv-dl-backdrop';
+
+      var items = sections.map(function (s) {
+        return { id: s.id, label: getSectionLabel(s, 0) };
+      });
+
+      var checkboxRows = items.map(function (item) {
+        return '<label class="cv-dl-item"><input type="checkbox" value="' + item.id + '" checked><span>' + item.label + '</span></label>';
+      }).join('');
+
+      backdrop.innerHTML =
+        '<div class="cv-dl-modal">' +
+          '<div class="cv-dl-modal__header"><h3>Download PDF</h3><p>Choose which sections to include</p></div>' +
+          '<div class="cv-dl-modal__toolbar">' +
+            '<button id="cv-dl-all">Select all</button>' +
+            '<button id="cv-dl-none">Deselect all</button>' +
+          '</div>' +
+          '<div class="cv-dl-modal__sections">' + checkboxRows + '</div>' +
+          '<div class="cv-dl-modal__footer">' +
+            '<button class="cv-dl-modal__cancel">Cancel</button>' +
+            '<a class="cv-dl-modal__download" href="#">&#8595; Download PDF</a>' +
+          '</div>' +
+        '</div>';
+
+      document.body.appendChild(backdrop);
+
+      var checkboxes = Array.from(backdrop.querySelectorAll('input[type="checkbox"]'));
+      var downloadAnchor = backdrop.querySelector('.cv-dl-modal__download');
+
+      function updateDownloadLink() {
+        var unchecked = checkboxes.filter(function (c) { return !c.checked; }).map(function (c) { return c.value; });
+        var url = new URL(baseHref, location.origin);
+        if (unchecked.length) url.searchParams.set('exclude', unchecked.join(','));
+        else url.searchParams.delete('exclude');
+        downloadAnchor.href = url.toString();
+      }
+
+      updateDownloadLink();
+      checkboxes.forEach(function (cb) { cb.addEventListener('change', updateDownloadLink); });
+
+      backdrop.querySelector('#cv-dl-all').addEventListener('click', function () {
+        checkboxes.forEach(function (c) { c.checked = true; });
+        updateDownloadLink();
+      });
+      backdrop.querySelector('#cv-dl-none').addEventListener('click', function () {
+        checkboxes.forEach(function (c) { c.checked = false; });
+        updateDownloadLink();
+      });
+      backdrop.querySelector('.cv-dl-modal__cancel').addEventListener('click', function () { backdrop.remove(); });
+      downloadAnchor.addEventListener('click', function () { backdrop.remove(); });
+      backdrop.addEventListener('click', function (e) { if (e.target === backdrop) backdrop.remove(); });
+    }
+
     // ── Scroll-fade animations ───────────────────────────────
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var fadeIO = new IntersectionObserver(function (entries) {
