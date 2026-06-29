@@ -7,7 +7,9 @@
       "Bash(echo \"cv-section count: $\\(curl -s http://localhost:3000)",
       "Bash(npx kill-port *)",
       "Bash(echo \"cv-sections: $\\(curl -s http://localhost:3000)",
-      "Bash(curl -s http://localhost:3000/)"
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(grep -n \"\\\\\"projects\\\\\"\\\\|x_funFacts\\\\|x_philosophy\\\\|x_professionalSummary\" -A3 \"\\\\\\\\\\\\\\\\rathserver.local\\\\storage\\\\resume\\\\resume.json\" 2>/dev/null | head -50)",
+      "Read(///rathserver.local/storage/resume/**)"
     ]
   }
 }

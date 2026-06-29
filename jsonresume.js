@@ -155,7 +155,9 @@ function renderProjects(projects) {
     const name = p.url
       ? `<a href="${esc(p.url)}">${esc(p.name || '')}</a>`
       : esc(p.name || '');
+    const image = p.image ? `<img class="cv-project__image" src="${esc(p.image)}" alt="${esc(p.name || '')}">` : '';
     return `<div class="cv-project">
+      ${image}
       <h4>${name}</h4>
       <p>${esc(p.description || '')}</p>
       <div class="cv-tags">${tags}</div>

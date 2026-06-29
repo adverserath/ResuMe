@@ -144,6 +144,7 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ResuMe — Self-hosted CV</title>
   <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">${ogMeta}
+  ${forPdf ? `<base href="http://localhost:${PORT}/">` : ''}
   ${styleBlock}${pdfStyles}
   ${controlsCss}
 </head>
@@ -253,6 +254,7 @@ app.get('/og-image', puppeteerLimiter, async (req, res) => {
     const photo = basics.image ? `<img src="${basics.image}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #fff;">` : `<div style="width:96px;height:96px;border-radius:50%;background:#e6edf3;display:flex;align-items:center;justify-content:center;font-size:40px;">👤</div>`;
 
     const ogHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<base href="http://localhost:${PORT}/">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { width: 1200px; height: 630px; display: flex; align-items: center; justify-content: center;

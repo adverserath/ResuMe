@@ -4,8 +4,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./cv.md:/app/cv.md:ro
       - ./resume.json:/app/resume.json:ro
+      - ./images:/app/public/images:ro
     restart: unless-stopped
     environment:
       - PORT=3000
