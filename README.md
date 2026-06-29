@@ -137,7 +137,7 @@ This paragraph only appears in the PDF download.
 
 ## Contact form
 
-A "Contact me" button appears in the control bar whenever `TELEGRAM_BOT_TOKEN`
+A "Telegram me" button appears in the control bar whenever `TELEGRAM_BOT_TOKEN`
 and `TELEGRAM_CHAT_ID` are both set (see below) - it opens a small popup form
 (name / contact / message) that POSTs to the server, which relays the message
 to your Telegram via the Bot API. No email address or Telegram username is
@@ -156,7 +156,7 @@ create a bot and get a token, then message your new bot once and call
 |---|---|---|
 | `PORT` | `3000` | HTTP port |
 | `CHROMIUM_PATH` | `/usr/bin/chromium` | Path to Chromium binary |
-| `TELEGRAM_BOT_TOKEN` | (none) | Bot token from [@BotFather](https://t.me/BotFather); leave unset to hide the Contact me button |
+| `TELEGRAM_BOT_TOKEN` | (none) | Bot token from [@BotFather](https://t.me/BotFather); leave unset to hide the Telegram me button |
 | `TELEGRAM_CHAT_ID` | (none) | Chat ID the contact form messages get sent to |
 
 ---

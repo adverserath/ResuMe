@@ -387,11 +387,11 @@
 
       backdrop.innerHTML =
         '<div class="cv-contact-modal">' +
-          '<div class="cv-contact-modal__header"><h3>Contact me</h3><p>Sends a message straight to my Telegram</p></div>' +
+          '<div class="cv-contact-modal__header"><h3>Telegram me</h3><p>Sends a message straight to my Telegram, or reach out to me via LinkedIn</p></div>' +
           '<form class="cv-contact-modal__form">' +
             '<div class="cv-contact-modal__body">' +
               '<label>Name<input type="text" name="name" maxlength="100"></label>' +
-              '<label>Email or Telegram (optional)<input type="text" name="contact" maxlength="200"></label>' +
+              '<label>Email or Telegram (optional) or Telephone<input type="text" name="contact" maxlength="200"></label>' +
               '<label>Message<textarea name="message" rows="4" maxlength="2000" required></textarea></label>' +
               '<label class="cv-contact-hp">Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>' +
               '<p class="cv-contact-modal__status" role="status"></p>' +

@@ -183,7 +183,7 @@ function buildHtml(markdownHtml, theme, { forPdf = false } = {}) {
   </style>` : '';
 
   const contactBtn = TELEGRAM_CONFIGURED
-    ? `<button type="button" id="cv-contact-btn" class="cv-controls__contact">&#9993; Contact me</button>`
+    ? `<button type="button" id="cv-contact-btn" class="cv-controls__contact">&#9993; Telegram me</button>`
     : '';
 
   const controls = forPdf ? '' : `
@@ -338,7 +338,7 @@ app.post('/contact', contactLimiter, async (req, res) => {
 
   const safeName = String(name || '').trim().slice(0, 100) || 'Anonymous';
   const safeContact = String(contact || '').trim().slice(0, 200);
-  const body = `New ResuMe contact form message\n\nFrom: ${safeName}${safeContact ? `\nContact: ${safeContact}` : ''}\n\n${text}`;
+  const body = `New ResuMe contact form message\n\nFrom: ${safeName}${safeContact ? `\nContact: ${safeContact}` : ''}\nIP: ${req.ip}\n\n${text}`;
 
   try {
     const tgRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
