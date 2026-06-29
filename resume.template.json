@@ -11,7 +11,7 @@
     "label": "Job Title  ·  Specialty  ·  Another Specialty",
     "image": "",
     "email": "you@example.com",
-    "summary": "A short opening paragraph about yourself. Supports **Markdown** — bold, links, etc.\n\nA second paragraph if you need one.",
+    "summary": "A short opening paragraph about yourself. Supports **Markdown** - bold, links, etc.\n\nA second paragraph if you need one.",
     "location": {
       "city": "City",
       "region": "Region",
@@ -40,8 +40,8 @@
       "endDate": "",
       "summary": "What this role involved. Supports **Markdown**.",
       "highlights": [
-        "**Achievement one** — quantified result or impact.",
-        "**Achievement two** — another bullet."
+        "**Achievement one** - quantified result or impact.",
+        "**Achievement two** - another bullet."
       ]
     },
     {
@@ -51,7 +51,7 @@
       "endDate": "2020",
       "summary": "Description of responsibilities.",
       "highlights": [
-        "**Key project** — what you built and why it mattered."
+        "**Key project** - what you built and why it mattered."
       ]
     }
   ],
@@ -81,7 +81,7 @@
     }
   ],
 
-  "x_educationNote": "Optional italic note rendered below the education table — useful for explaining overlapping dates or unusual timelines.",
+  "x_educationNote": "Optional italic note rendered below the education table - useful for explaining overlapping dates or unusual timelines.",
 
   "skills": [
     {
@@ -115,7 +115,7 @@
   "x_philosophy": "Optional freeform section rendered as Markdown. A good place for your working style, values, or approach to engineering.",
 
   "x_funFacts": [
-    "A specific personal story or fact — the more concrete the better.",
-    "Another one — avoid vague generalities."
+    "A specific personal story or fact - the more concrete the better.",
+    "Another one - avoid vague generalities."
   ]
 }

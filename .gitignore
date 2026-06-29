@@ -4,12 +4,12 @@ node_modules/
 # Local environment overrides
 .env
 
-# Your personal CV data — keep off the repo
+# Your personal CV data - keep off the repo
 # Use resume.template.json as the starting point
 resume.json
 cv.md
 
-# Lock file (optional — remove this line if you want reproducible installs)
+# Lock file (optional - remove this line if you want reproducible installs)
 # package-lock.json
 
 # Debug / scratch files

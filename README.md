@@ -8,19 +8,19 @@ A self-hosted CV platform. Write your CV in JSON Resume format, get a styled web
 
 ## Features
 
-- **JSON Resume** — author your CV in the open [JSON Resume](https://jsonresume.org) schema (`resume.json`)
-- **Multiple themes** — GitHub, Minimal, Dark — switchable live from the top bar
-- **PDF download** — server-side PDF via headless Chromium; clean print layout with no sidebar or controls
-- **Sidebar navigation** — sticky contents panel with active-section highlighting
-- **Collapsible sections** — collapse/expand any section; state persists in localStorage
-- **Ctrl+K command palette** — jump to section, switch theme, or download PDF from the keyboard
-- **Timeline view** — toggle the Experience section between card and vertical timeline layout
-- **Section deep-links** — hover any section to reveal a copy-link button
-- **Scroll-fade animations** — sections animate in as they enter the viewport
-- **OG image** — `/og-image` renders a 1200×630 social card via Puppeteer (auto-wired into `og:image`)
-- **Print/web-only blocks** — wrap content in `<!-- web-only -->` or `<!-- print-only -->` to show it only in the relevant output
-- **Configurable PDF filename** — set `meta.pdfFilename` in `resume.json` (e.g. `david-rath.pdf`)
-- **Docker Compose** — one command to run everywhere
+- **JSON Resume** - author your CV in the open [JSON Resume](https://jsonresume.org) schema (`resume.json`)
+- **Multiple themes** - GitHub, Minimal, Dark - switchable live from the top bar
+- **PDF download** - server-side PDF via headless Chromium; clean print layout with no sidebar or controls
+- **Sidebar navigation** - sticky contents panel with active-section highlighting
+- **Collapsible sections** - collapse/expand any section; state persists in localStorage
+- **Ctrl+K command palette** - jump to section, switch theme, or download PDF from the keyboard
+- **Timeline view** - toggle the Experience section between card and vertical timeline layout
+- **Section deep-links** - hover any section to reveal a copy-link button
+- **Scroll-fade animations** - sections animate in as they enter the viewport
+- **OG image** - `/og-image` renders a 1200×630 social card via Puppeteer (auto-wired into `og:image`)
+- **Print/web-only blocks** - wrap content in `<!-- web-only -->` or `<!-- print-only -->` to show it only in the relevant output
+- **Configurable PDF filename** - set `meta.pdfFilename` in `resume.json` (e.g. `david-rath.pdf`)
+- **Docker Compose** - one command to run everywhere
 
 ---
 
@@ -37,6 +37,8 @@ docker compose up
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+A pre-built image is also published as [`adverserath/resume:latest`](https://hub.docker.com/r/adverserath/resume) - `docker compose up` pulls it by default; pass `--build` to build from source instead.
 
 ### Without Docker
 
@@ -83,7 +85,7 @@ All configuration lives in the `meta` block at the top of `resume.json`:
 
 | Name | Description |
 |---|---|
-| `github` | Light, clean — matches GitHub's markdown style |
+| `github` | Light, clean - matches GitHub's markdown style |
 | `minimal` | Minimal serif typography |
 | `dark` | Dark background, high contrast |
 
@@ -98,7 +100,7 @@ ResuMe uses the [JSON Resume v1.0.0 schema](https://jsonresume.org/schema) with 
 | Field | Purpose |
 |---|---|
 | `x_educationNote` | Italic note rendered below the Education table |
-| `x_philosophy` | Freeform Markdown section — working style, values |
+| `x_philosophy` | Freeform Markdown section - working style, values |
 | `x_funFacts` | Array of strings rendered as a bulleted list |
 
 See [`resume.template.json`](resume.template.json) for a fully annotated starting point.

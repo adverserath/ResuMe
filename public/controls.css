@@ -398,7 +398,7 @@
   border-color: #0969da;
 }
 
-/* Timeline layout — active when .cv-section has .cv-timeline-mode */
+/* Timeline layout - active when .cv-section has .cv-timeline-mode */
 .cv-timeline-mode .cv-section__body > h3 {
   display: none;
 }

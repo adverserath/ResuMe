@@ -1,4 +1,4 @@
-/* Minimal typographic style — print-document feel */
+/* Minimal typographic style - print-document feel */
 *, *::before, *::after { box-sizing: border-box; }
 
 body {

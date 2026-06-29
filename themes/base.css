@@ -1,4 +1,4 @@
-/* Shared structural layout — loaded alongside every theme */
+/* Shared structural layout - loaded alongside every theme */
 
 /* ── Profile header ─────────────────────────────────────── */
 .cv-header {
@@ -70,7 +70,7 @@
   opacity: 0.45;
 }
 
-/* Photo — swap placeholder for a real image */
+/* Photo - swap placeholder for a real image */
 .cv-photo img {
   width: 128px;
   height: 128px;

@@ -1,5 +1,6 @@
 services:
   resume:
+    image: adverserath/resume:latest
     build: .
     ports:
       - "3000:3000"
