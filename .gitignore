@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Your personal CV data — keep off the repo
+# Use resume.template.json as the starting point
+resume.json
+cv.md
+
+# Lock file (optional — remove this line if you want reproducible installs)
+# package-lock.json
+
+# Debug / scratch files
+debug.html
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

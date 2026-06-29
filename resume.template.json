@@ -1,0 +1,121 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+
+  "meta": {
+    "theme": "github",
+    "pdfFilename": "your-name.pdf"
+  },
+
+  "basics": {
+    "name": "Your Name",
+    "label": "Job Title  ·  Specialty  ·  Another Specialty",
+    "image": "",
+    "email": "you@example.com",
+    "summary": "A short opening paragraph about yourself. Supports **Markdown** — bold, links, etc.\n\nA second paragraph if you need one.",
+    "location": {
+      "city": "City",
+      "region": "Region",
+      "countryCode": "UK"
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "username": "your-linkedin-slug",
+        "url": "https://linkedin.com/in/your-linkedin-slug"
+      },
+      {
+        "network": "GitHub",
+        "username": "your-github",
+        "url": "https://github.com/your-github"
+      }
+    ]
+  },
+
+  "work": [
+    {
+      "name": "Company Name",
+      "position": "Job Title",
+      "url": "",
+      "startDate": "2020",
+      "endDate": "",
+      "summary": "What this role involved. Supports **Markdown**.",
+      "highlights": [
+        "**Achievement one** — quantified result or impact.",
+        "**Achievement two** — another bullet."
+      ]
+    },
+    {
+      "name": "Previous Company",
+      "position": "Earlier Role",
+      "startDate": "2015",
+      "endDate": "2020",
+      "summary": "Description of responsibilities.",
+      "highlights": [
+        "**Key project** — what you built and why it mattered."
+      ]
+    }
+  ],
+
+  "volunteer": [
+    {
+      "organization": "Organisation Name",
+      "position": "Your Role",
+      "startDate": "2018",
+      "endDate": "",
+      "summary": "What you do here. Shown under the **Leadership** heading.",
+      "highlights": [
+        "Area of activity",
+        "Another area"
+      ]
+    }
+  ],
+
+  "education": [
+    {
+      "institution": "University Name",
+      "area": "Subject",
+      "studyType": "BSc",
+      "startDate": "2012",
+      "endDate": "2015",
+      "score": "First Class Honours"
+    }
+  ],
+
+  "x_educationNote": "Optional italic note rendered below the education table — useful for explaining overlapping dates or unusual timelines.",
+
+  "skills": [
+    {
+      "name": "Languages",
+      "keywords": ["Python", "TypeScript", "SQL"]
+    },
+    {
+      "name": "Cloud & Infra",
+      "keywords": ["AWS", "Docker", "Linux"]
+    },
+    {
+      "name": "Engineering",
+      "keywords": ["REST APIs", "CI/CD", "Microservices"]
+    }
+  ],
+
+  "projects": [
+    {
+      "name": "Project Name",
+      "description": "What it does and why it's interesting.",
+      "url": "https://github.com/your-github/project",
+      "keywords": ["Node.js", "Docker"]
+    },
+    {
+      "name": "Another Project",
+      "description": "Description without a URL is fine too.",
+      "keywords": ["Python", "Raspberry Pi"]
+    }
+  ],
+
+  "x_philosophy": "Optional freeform section rendered as Markdown. A good place for your working style, values, or approach to engineering.",
+
+  "x_funFacts": [
+    "A specific personal story or fact — the more concrete the better.",
+    "Another one — avoid vague generalities."
+  ]
+}

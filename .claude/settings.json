@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pkill -f \"node server.js\")",
+      "Bash(node server.js)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(echo \"cv-section count: $\\(curl -s http://localhost:3000)",
+      "Bash(npx kill-port *)",
+      "Bash(echo \"cv-sections: $\\(curl -s http://localhost:3000)",
+      "Bash(curl -s http://localhost:3000/)"
+    ]
+  }
+}
