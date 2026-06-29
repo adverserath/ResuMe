@@ -40,7 +40,14 @@
   outline-offset: 1px;
 }
 
-.cv-controls__download {
+.cv-controls__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cv-controls__download,
+.cv-controls__contact {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -48,14 +55,29 @@
   font-size: 13px;
   font-weight: 500;
   color: #ffffff;
-  background-color: #1a7f37;
   border-radius: 6px;
   text-decoration: none;
   transition: background-color 0.15s;
 }
 
+.cv-controls__download {
+  background-color: #1a7f37;
+}
+
 .cv-controls__download:hover {
   background-color: #116329;
+  text-decoration: none;
+}
+
+.cv-controls__contact {
+  background-color: #229ed9;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.cv-controls__contact:hover {
+  background-color: #1b7fb8;
   text-decoration: none;
 }
 
@@ -602,6 +624,162 @@
   background: #116329;
   text-decoration: none;
   color: #fff;
+}
+
+/* ── Contact form modal ─────────────────────────────────── */
+.cv-contact-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: cv-backdrop-in 0.1s ease;
+}
+
+.cv-contact-modal {
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  animation: cv-palette-in 0.12s ease;
+}
+
+.cv-contact-modal__header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.cv-contact-modal__header h3 {
+  margin: 0 0 2px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2328;
+}
+
+.cv-contact-modal__header p {
+  margin: 0;
+  font-size: 12px;
+  color: #57606a;
+}
+
+.cv-contact-modal__form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cv-contact-modal__body {
+  overflow-y: auto;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cv-contact-modal__body label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #57606a;
+}
+
+.cv-contact-modal__body input[type="text"],
+.cv-contact-modal__body textarea {
+  font-size: 13px;
+  font-family: inherit;
+  color: #1f2328;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 6px 10px;
+  resize: vertical;
+}
+
+.cv-contact-modal__body input[type="text"]:focus,
+.cv-contact-modal__body textarea:focus {
+  outline: 2px solid #0969da;
+  outline-offset: 1px;
+}
+
+.cv-contact-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.cv-contact-modal__status {
+  margin: 0;
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.cv-contact-modal__status--error {
+  color: #cf222e;
+}
+
+.cv-contact-modal__success {
+  margin: 0;
+  font-size: 13px;
+  color: #1a7f37;
+  font-weight: 500;
+}
+
+.cv-contact-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid #d0d7de;
+  background: #f6f8fa;
+}
+
+.cv-contact-modal__cancel {
+  font-size: 13px;
+  font-weight: 500;
+  color: #57606a;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  padding: 5px 14px;
+  cursor: pointer;
+}
+
+.cv-contact-modal__cancel:hover {
+  background: #f3f4f6;
+}
+
+.cv-contact-modal__send {
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  background: #229ed9;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cv-contact-modal__send:hover {
+  background: #1b7fb8;
+}
+
+.cv-contact-modal__send:disabled {
+  background: #8fc6e3;
+  cursor: default;
 }
 
 /* ── Footer ──────────────────────────────────────────────── */

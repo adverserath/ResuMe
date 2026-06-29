@@ -375,6 +375,82 @@
       backdrop.addEventListener('click', function (e) { if (e.target === backdrop) backdrop.remove(); });
     }
 
+    // ── Contact modal ─────────────────────────────────────────
+    var contactBtn = document.getElementById('cv-contact-btn');
+    if (contactBtn) {
+      contactBtn.addEventListener('click', openContactModal);
+    }
+
+    function openContactModal() {
+      var backdrop = document.createElement('div');
+      backdrop.className = 'cv-contact-backdrop';
+
+      backdrop.innerHTML =
+        '<div class="cv-contact-modal">' +
+          '<div class="cv-contact-modal__header"><h3>Contact me</h3><p>Sends a message straight to my Telegram</p></div>' +
+          '<form class="cv-contact-modal__form">' +
+            '<div class="cv-contact-modal__body">' +
+              '<label>Name<input type="text" name="name" maxlength="100"></label>' +
+              '<label>Email or Telegram (optional)<input type="text" name="contact" maxlength="200"></label>' +
+              '<label>Message<textarea name="message" rows="4" maxlength="2000" required></textarea></label>' +
+              '<label class="cv-contact-hp">Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>' +
+              '<p class="cv-contact-modal__status" role="status"></p>' +
+            '</div>' +
+            '<div class="cv-contact-modal__footer">' +
+              '<button type="button" class="cv-contact-modal__cancel">Cancel</button>' +
+              '<button type="submit" class="cv-contact-modal__send">Send</button>' +
+            '</div>' +
+          '</form>' +
+        '</div>';
+
+      document.body.appendChild(backdrop);
+
+      var form = backdrop.querySelector('.cv-contact-modal__form');
+      var sendBtn = backdrop.querySelector('.cv-contact-modal__send');
+      var status = backdrop.querySelector('.cv-contact-modal__status');
+
+      function close() { backdrop.remove(); }
+
+      backdrop.querySelector('.cv-contact-modal__cancel').addEventListener('click', close);
+      backdrop.addEventListener('click', function (e) { if (e.target === backdrop) close(); });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var data = new FormData(form);
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending…';
+        status.textContent = '';
+        status.className = 'cv-contact-modal__status';
+
+        fetch('/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: data.get('name'),
+            contact: data.get('contact'),
+            message: data.get('message'),
+            website: data.get('website'),
+          }),
+        })
+          .then(function (res) { return res.json().then(function (json) { return { ok: res.ok, json: json }; }); })
+          .then(function (result) {
+            if (result.ok && result.json.ok) {
+              form.querySelector('.cv-contact-modal__body').innerHTML = '<p class="cv-contact-modal__success">Message sent — thanks! I’ll get back to you soon.</p>';
+              backdrop.querySelector('.cv-contact-modal__footer').innerHTML = '';
+              setTimeout(close, 1800);
+            } else {
+              throw new Error((result.json && result.json.error) || 'Something went wrong.');
+            }
+          })
+          .catch(function (err) {
+            status.textContent = err.message;
+            status.className = 'cv-contact-modal__status cv-contact-modal__status--error';
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Send';
+          });
+      });
+    }
+
     // ── Scroll-fade animations ───────────────────────────────
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var fadeIO = new IntersectionObserver(function (entries) {

@@ -8,8 +8,12 @@ const rateLimit = require('express-rate-limit');
 const jsonresume = require('./jsonresume');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 const CHROMIUM_PATH = process.env.CHROMIUM_PATH || '/usr/bin/chromium';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '';
+const TELEGRAM_CONFIGURED = Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID);
 const THEMES = ['github', 'minimal', 'dark'];
 const JSON_RESUME_PATH = path.join(__dirname, 'resume.json');
 const MARKDOWN_PATH = path.join(__dirname, 'cv.md');
@@ -35,6 +39,7 @@ marked.setOptions({ gfm: true, breaks: false });
 
 app.use('/themes', express.static(path.join(__dirname, 'themes')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.json({ limit: '10kb' }));
 
 const puppeteerLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -42,6 +47,14 @@ const puppeteerLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: 'Too many requests - please try again in a few minutes.',
+});
+
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many messages - please try again later.',
 });
 
 app.get('/robots.txt', (req, res) => {
@@ -72,7 +85,7 @@ function filterSections(wrappedHtml, excludeSlugs) {
   return parts.join('\n');
 }
 
-function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
+function buildHtml(markdownHtml, theme, { forPdf = false } = {}) {
   const styleBlock = forPdf
     ? `<style>${readCss('base')}</style>\n  <style>${readCss(theme)}</style>`
     : `<link rel="stylesheet" href="/themes/base.css">\n  <link rel="stylesheet" href="/themes/${theme}.css">`;
@@ -169,6 +182,10 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
     .cv-photo img { display: block !important; }
   </style>` : '';
 
+  const contactBtn = TELEGRAM_CONFIGURED
+    ? `<button type="button" id="cv-contact-btn" class="cv-controls__contact">&#9993; Contact me</button>`
+    : '';
+
   const controls = forPdf ? '' : `
     <div class="cv-controls">
       <div class="cv-controls__left">
@@ -177,7 +194,10 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
           ${THEMES.map(t => `<option value="${t}"${t === theme ? ' selected' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join('\n          ')}
         </select>
       </div>
-      <a href="/download?theme=${theme}" class="cv-controls__download">&#8595; Download PDF</a>
+      <div class="cv-controls__right">
+        ${contactBtn}
+        <a href="/download?theme=${theme}" class="cv-controls__download">&#8595; Download PDF</a>
+      </div>
     </div>`;
 
   const controlsCss = forPdf ? '' : '<link rel="stylesheet" href="/public/controls.css">';
@@ -297,6 +317,42 @@ app.get('/timeline', (req, res) => {
     '<script>localStorage.setItem("cv-timeline","on");</script><script src="/public/app.js"></script>'
   );
   res.send(injected);
+});
+
+app.post('/contact', contactLimiter, async (req, res) => {
+  if (!TELEGRAM_CONFIGURED) {
+    return res.status(503).json({ ok: false, error: 'Contact form is not configured.' });
+  }
+
+  const { name, contact, message, website } = req.body || {};
+
+  if (website) {
+    // Honeypot field - bots fill this in, real users never see it.
+    return res.json({ ok: true });
+  }
+
+  const text = String(message || '').trim();
+  if (!text || text.length > 2000) {
+    return res.status(400).json({ ok: false, error: 'Message is required (max 2000 characters).' });
+  }
+
+  const safeName = String(name || '').trim().slice(0, 100) || 'Anonymous';
+  const safeContact = String(contact || '').trim().slice(0, 200);
+  const body = `New ResuMe contact form message\n\nFrom: ${safeName}${safeContact ? `\nContact: ${safeContact}` : ''}\n\n${text}`;
+
+  try {
+    const tgRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: body }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!tgRes.ok) throw new Error('Telegram API error: ' + tgRes.status);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Telegram send failed:', err);
+    res.status(502).json({ ok: false, error: 'Could not send message right now.' });
+  }
 });
 
 app.get('/og-image', puppeteerLimiter, async (req, res) => {

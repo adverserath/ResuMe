@@ -131,6 +131,22 @@ This paragraph only appears in the PDF download.
 | `/download?theme=<name>` | Download PDF |
 | `/timeline` | CV with Experience in timeline view |
 | `/og-image` | 1200×630 PNG social card (requires Chromium) |
+| `/contact` | `POST` - relays the contact form to Telegram (requires `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`) |
+
+---
+
+## Contact form
+
+A "Contact me" button appears in the control bar whenever `TELEGRAM_BOT_TOKEN`
+and `TELEGRAM_CHAT_ID` are both set (see below) - it opens a small popup form
+(name / contact / message) that POSTs to the server, which relays the message
+to your Telegram via the Bot API. No email address or Telegram username is
+ever exposed in the page HTML, and no captcha is needed since the endpoint is
+protected by IP rate limiting and a honeypot field.
+
+To set it up: message [@BotFather](https://t.me/BotFather) on Telegram to
+create a bot and get a token, then message your new bot once and call
+`https://api.telegram.org/bot<token>/getUpdates` to find your chat ID.
 
 ---
 
@@ -140,6 +156,8 @@ This paragraph only appears in the PDF download.
 |---|---|---|
 | `PORT` | `3000` | HTTP port |
 | `CHROMIUM_PATH` | `/usr/bin/chromium` | Path to Chromium binary |
+| `TELEGRAM_BOT_TOKEN` | (none) | Bot token from [@BotFather](https://t.me/BotFather); leave unset to hide the Contact me button |
+| `TELEGRAM_CHAT_ID` | (none) | Chat ID the contact form messages get sent to |
 
 ---
 
