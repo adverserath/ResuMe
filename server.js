@@ -41,7 +41,7 @@ const puppeteerLimiter = rateLimit({
   limit: 5,
   standardHeaders: true,
   legacyHeaders: false,
-  message: 'Too many requests — please try again in a few minutes.',
+  message: 'Too many requests - please try again in a few minutes.',
 });
 
 app.get('/robots.txt', (req, res) => {
@@ -80,34 +80,93 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
   const pdfStyles = forPdf ? `
   <style>
     body { background: #fff !important; }
+    .markdown-body, .markdown-body * {
+      color: #111 !important;
+      font-family: Arial, Helvetica, sans-serif !important;
+    }
     .markdown-body {
       font-size: 11.5px;
       max-width: 100%;
       margin: 0;
       padding: 0;
     }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3,
+    .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+      border-bottom: none !important;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+    }
+    .markdown-body a { text-decoration: underline !important; }
     .markdown-body h1 { font-size: 1.6em; }
-    .markdown-body h2 { font-size: 1.2em; margin-top: 0; margin-bottom: 10px; }
+    .markdown-body h2 {
+      font-size: 1.2em;
+      margin-top: 0;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #999 !important;
+      padding-bottom: 4px;
+    }
     .markdown-body h3 { font-size: 1.05em; margin-top: 8px; margin-bottom: 4px; }
     .markdown-body h2, .markdown-body h3 { break-after: avoid; page-break-after: avoid; }
-    .markdown-body table { display: table; overflow: visible; width: 100%; }
+    .markdown-body table { display: table; overflow: visible; width: 100%; border-collapse: collapse; }
+    .markdown-body table tr, .markdown-body table td, .markdown-body table th {
+      background: transparent !important;
+      border-color: #ccc !important;
+    }
     .markdown-body p { margin-bottom: 8px; }
     .markdown-body ul { margin-bottom: 8px; }
+
+    /* Flatten card/section styling into a plain stacked layout.
+       No page-break-inside:avoid here - sections like Experience are
+       taller than a page, and avoiding a break on the whole block just
+       pushes it entirely to the next page, leaving a blank gap behind it. */
     .cv-section {
       border: none !important;
       border-radius: 0 !important;
       box-shadow: none !important;
+      background: transparent !important;
       padding: 0 0 12px 0 !important;
       margin-bottom: 0 !important;
-      page-break-inside: avoid;
-      break-inside: avoid;
     }
     .cv-section:first-child { padding: 0 0 12px 0 !important; }
     .cv-section + .cv-section {
-      border-top: 1px solid #d0d7de !important;
+      border-top: 1px solid #999 !important;
       padding-top: 12px !important;
     }
-    .cv-project { page-break-inside: avoid; break-inside: avoid; }
+
+    /* Keep each individual job/role entry intact across a page break */
+    .cv-entry {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .cv-entry + .cv-entry { margin-top: 8px; }
+
+    /* Plain stacked project list instead of a colored card grid */
+    .cv-projects-grid { display: block !important; }
+    .cv-project {
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      padding: 0 0 8px 0 !important;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Plain comma-separated keywords instead of colored pills */
+    .cv-tags { display: block !important; }
+    .cv-tag {
+      display: inline !important;
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      padding: 0 !important;
+      opacity: 1 !important;
+    }
+    .cv-tag::after { content: ", "; }
+    .cv-tag:last-child::after { content: ""; }
+
+    /* Hide any inline images dropped into markdown text, but keep the headshot */
+    .markdown-body img { display: none !important; }
+    .cv-photo img { display: block !important; }
   </style>` : '';
 
   const controls = forPdf ? '' : `
@@ -126,7 +185,7 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
   const bodyAttr = forPdf ? ' class="pdf-mode"' : '';
   const footer = forPdf ? '' : `
   <footer class="cv-footer">
-    Built with <a href="https://github.com/adverserath/ResuMe" target="_blank" rel="noopener">ResuMe</a> — self-hosted CV platform
+    Built with <a href="https://github.com/adverserath/ResuMe" target="_blank" rel="noopener">ResuMe</a> - self-hosted CV platform
     &nbsp;·&nbsp;
     <a href="https://buymeacoffee.com/adverserath" target="_blank" rel="noopener">☕ Buy me a coffee</a>
   </footer>`;
@@ -142,7 +201,7 @@ function buildHtml(markdownHtml, theme, { forPdf = false, meta = {} } = {}) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ResuMe — Self-hosted CV</title>
+  <title>ResuMe - Self-hosted CV</title>
   <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">${ogMeta}
   ${forPdf ? `<base href="http://localhost:${PORT}/">` : ''}
   ${styleBlock}${pdfStyles}
@@ -174,11 +233,11 @@ function wrapSections(html) {
   return parts.map(s => `<section class="cv-section">${s}</section>`).join('\n');
 }
 
-function loadCvHtml() {
+function loadCvHtml(forPdf = false) {
   if (fs.existsSync(JSON_RESUME_PATH)) {
     try {
       const data = JSON.parse(fs.readFileSync(JSON_RESUME_PATH, 'utf8'));
-      return jsonresume.render(data);
+      return jsonresume.render(data, { forPdf });
     } catch (err) {
       console.error('Failed to parse resume.json, falling back to cv.md:', err.message);
     }
@@ -207,7 +266,7 @@ app.get('/download', puppeteerLimiter, async (req, res) => {
     });
     const page = await browser.newPage();
     await page.setViewport({ width: 800, height: 1131 });
-    let html = applyModeFilter(wrapSections(loadCvHtml()), true);
+    let html = applyModeFilter(wrapSections(loadCvHtml(true)), true);
     if (exclude.length) html = filterSections(html, exclude);
     await page.setContent(buildHtml(html, theme, { forPdf: true }), {
       waitUntil: 'domcontentloaded',

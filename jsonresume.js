@@ -48,6 +48,12 @@ function networkIcon(network) {
   return NETWORK_ICONS[String(network || '').toLowerCase()] || '🔗';
 }
 
+const LEADING_EMOJI_RE = /^[\p{Extended_Pictographic}‍️]+\s*/u;
+
+function stripLeadingEmoji(s) {
+  return String(s || '').replace(LEADING_EMOJI_RE, '');
+}
+
 function renderHeader(basics) {
   if (!basics) return '';
 
@@ -110,13 +116,13 @@ function renderWork(work) {
     const company = job.url
       ? `<a href="${esc(job.url)}">${esc(job.name || job.company || '')}</a>`
       : esc(job.name || job.company || '');
-    const title = `${esc(job.position || '')} — ${company}`;
+    const title = `${esc(job.position || '')} - ${company}`;
     const range = dateRange(job.startDate, job.endDate);
     const summary = job.summary ? md(job.summary) : '';
     const highlights = Array.isArray(job.highlights) && job.highlights.length
       ? `<ul>${job.highlights.map(h => `<li>${mdInline(h)}</li>`).join('')}</ul>`
       : '';
-    return `<h3>${title}</h3>\n<p><strong>${range}</strong></p>\n${summary}${highlights}`;
+    return `<div class="cv-entry"><h3>${title}</h3>\n<p><strong>${range}</strong></p>\n${summary}${highlights}</div>`;
   }).join('\n');
   return `<h2>Experience</h2>\n${items}`;
 }
@@ -146,16 +152,17 @@ function renderSkills(skills) {
   return `<h2>Technical Skills</h2>\n<table class="cv-skills-table">${rows}</table>`;
 }
 
-function renderProjects(projects) {
+function renderProjects(projects, forPdf) {
   if (!Array.isArray(projects) || !projects.length) return '';
   const cards = projects.map(p => {
     const tags = Array.isArray(p.keywords)
       ? p.keywords.map(k => `<span class="cv-tag">${esc(k)}</span>`).join('')
       : '';
+    const displayName = forPdf ? stripLeadingEmoji(p.name) : (p.name || '');
     const name = p.url
-      ? `<a href="${esc(p.url)}">${esc(p.name || '')}</a>`
-      : esc(p.name || '');
-    const image = p.image ? `<img class="cv-project__image" src="${esc(p.image)}" alt="${esc(p.name || '')}">` : '';
+      ? `<a href="${esc(p.url)}">${esc(displayName)}</a>`
+      : esc(displayName);
+    const image = (!forPdf && p.image) ? `<img class="cv-project__image" src="${esc(p.image)}" alt="${esc(p.name || '')}">` : '';
     return `<div class="cv-project">
       ${image}
       <h4>${name}</h4>
@@ -169,18 +176,18 @@ function renderProjects(projects) {
 function renderVolunteer(vol) {
   if (!Array.isArray(vol) || !vol.length) return '';
   const items = vol.map(v => {
-    const title = `${esc(v.position || '')} — ${esc(v.organization || '')}`;
+    const title = `${esc(v.position || '')} - ${esc(v.organization || '')}`;
     const range = dateRange(v.startDate, v.endDate);
     const summary = v.summary ? md(v.summary) : '';
     const highlights = Array.isArray(v.highlights) && v.highlights.length
       ? `<ul>${v.highlights.map(h => `<li>${mdInline(h)}</li>`).join('')}</ul>`
       : '';
-    return `<h3>${title}</h3>\n<p><strong>${range}</strong></p>\n${summary}${highlights}`;
+    return `<div class="cv-entry"><h3>${title}</h3>\n<p><strong>${range}</strong></p>\n${summary}${highlights}</div>`;
   }).join('\n');
   return `<h2>Leadership</h2>\n${items}`;
 }
 
-function render(data) {
+function render(data, { forPdf = false } = {}) {
   if (!data || typeof data !== 'object') return '';
   const sections = [
     renderHeader(data.basics),
@@ -190,7 +197,7 @@ function render(data) {
     renderVolunteer(data.volunteer),
     renderEducation(data.education, data.x_educationNote),
     renderSkills(data.skills),
-    renderProjects(data.projects),
+    renderProjects(data.projects, forPdf),
     renderCustomMarkdown('Philosophy', data.x_philosophy),
     renderFunFacts(data.x_funFacts),
   ].filter(Boolean);
